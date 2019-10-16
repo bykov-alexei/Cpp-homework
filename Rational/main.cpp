@@ -8,12 +8,7 @@ void printFraction(const Rational r) {
 }
 
 int main() {
-    Rational r1(2, 3);
-    Rational r2(4, 5);
-
-//    printFraction(r1 += r2);
-//    printFraction(r1 -= r2);
-//    printFraction(r2 *= r1);
-//    printFraction(r1 /= r2);
+    Rational r(2);
+    printFraction(r.sqrt());
     return 0;
 }

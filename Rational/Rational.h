@@ -42,6 +42,9 @@ public:
     bool operator>(const Rational &);
     bool operator>=(const Rational &);
 
+    Rational sqrt();
+    static Rational sqrt(const Rational &);
+
     void simplify();
 
 };

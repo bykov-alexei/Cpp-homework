@@ -78,12 +78,6 @@ Rational Rational::operator-() const {
     return *r;
 }
 
-void Rational::simplify() {
-    int g = gcd(numer, denom);
-    numer /= g;
-    denom /= g;
-}
-
 Rational Rational::operator+(const Rational & other) const {
     int g = gcd(other.denom, this->denom);
     int lcd = other.denom * this->denom / g;
@@ -174,6 +168,27 @@ bool Rational::operator>=(const Rational & other) {
     return !(*this < other);
 }
 
+void Rational::simplify() {
+    int g = gcd(numer, denom);
+    numer /= g;
+    denom /= g;
+}
+
+Rational Rational::sqrt() {
+    Rational x = *(new Rational(*this/2));
+    while (x.numer <= 65536 && x.denom <= 65536) {
+        x = Rational(1, 2) * (x + *this/x);
+    }
+    return x;
+}
+
+Rational Rational::sqrt(const Rational & a) {
+    Rational x = *(new Rational(a/2));
+    while (x.numer <= 65536 && x.denom <= 65536) {
+        x = Rational(1, 2) * (x + a/x);
+    }
+    return x;
+}
 
 
 
