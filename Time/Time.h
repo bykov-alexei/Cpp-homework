@@ -4,9 +4,10 @@
 
 #ifndef TIME_TIME_H
 #define TIME_TIME_H
+#include <string>
+using namespace std;
 
 class WrongValues {};
-
 
 class Time {
     int hours, minutes;
@@ -27,7 +28,7 @@ public:
     bool operator!=(const Time & other) const;
     bool operator<=(const Time & other) const;
     bool operator>=(const Time & other) const;
-
+    
     explicit operator int() const;
     explicit operator float() const;
 
@@ -35,5 +36,7 @@ public:
     int getMinutes() const;
     int getHours() const;
 };
+
+bool is_number(const string & str);
 
 #endif //TIME_TIME_H
