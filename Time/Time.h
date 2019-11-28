@@ -4,6 +4,7 @@
 
 #ifndef TIME_TIME_H
 #define TIME_TIME_H
+#include <iostream>
 #include <string>
 using namespace std;
 
@@ -22,20 +23,17 @@ public:
     Time operator+(const Time & other) const;
     Time operator-(const Time & other) const;
 
-    bool operator>(const Time & other) const;
-    bool operator<(const Time & other) const;
-    bool operator==(const Time & other) const;
-    bool operator!=(const Time & other) const;
-    bool operator<=(const Time & other) const;
-    bool operator>=(const Time & other) const;
-    
     explicit operator int() const;
     explicit operator float() const;
 
     float getSeconds() const;
     int getMinutes() const;
     int getHours() const;
+
 };
+
+std::ostream& operator<<(std::ostream & out, const Time & t);
+istream& operator>>(istream & in, Time & t);
 
 bool is_number(const string & str);
 
