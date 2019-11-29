@@ -1,5 +1,8 @@
 #include <iostream>
+#include <math.h>
 #include "Rational.h"
+
+using namespace std;
 
 int abs(int a) {
     return (a < 0) ? -a : a;
@@ -18,6 +21,11 @@ int gcd(int a, int b) {
     return gcd(b, a % b);
 }
 
+double frexp10(double arg, int & exp) {
+    exp = (arg == 0) ? 0 : 1 + (int)std::floor(std::log10(std::fabs(arg) ) );
+    return arg * std::pow(10 , -(exp));
+}
+
 Rational::Rational() {
     numer = 0;
     denom = 1;
@@ -29,7 +37,20 @@ Rational::Rational(int number) {
 }
 
 Rational::Rational(double num) {
-    //TODO: write
+    long long m, e;
+    m = e = *(long long*)&num;
+    long long t = 1;
+
+    e = ((e >> 53) & ((t << 10) - 1)) - 512;
+    m = !(m & ((t << 53) - 1));
+    cout << e << " " << m << endl;
+    cout << hex << e <<  " " << hex << m << endl;
+    this->numer = m;
+    if (e > 0) {
+        this->denom = 1 << e;
+    } else {
+        this->numer *= (1 << e);
+    }
 }
 
 Rational::Rational(int num, int den) {
@@ -42,6 +63,7 @@ Rational::Rational(int num, int den) {
         numer = -numer;
         denom = -denom;
     }
+    this->simplify();
 }
 
 Rational::Rational(const Rational &r) {
@@ -133,18 +155,18 @@ Rational & Rational::operator/=(const Rational & other) {
     return *this *= other.invert();
 }
 
-bool Rational::operator==(const Rational & other) {
+bool Rational::operator==(const Rational & other) const {
     Rational r1 = *this;
     Rational r2 = other;
     r1.simplify(); r2.simplify();
     return r1.numer == r2.numer && r1.denom == r2.denom;
 }
 
-bool Rational::operator!=(const Rational & other) {
+bool Rational::operator!=(const Rational & other) const {
     return !(*this == other);
 }
 
-bool Rational::operator<(const Rational & other) {
+bool Rational::operator<(const Rational & other) const {
     Rational r1 = *this;
     Rational r2 = other;
     int g = gcd(r1.denom, r2.denom);
@@ -156,15 +178,15 @@ bool Rational::operator<(const Rational & other) {
     return br1.numer < br2.numer;
 }
 
-bool Rational::operator<=(const Rational & other) {
+bool Rational::operator<=(const Rational & other) const {
     return (*this < other) || (*this == other);
 }
 
-bool Rational::operator>(const Rational & other) {
+bool Rational::operator>(const Rational & other) const {
     return !((*this < other || *this == other));
 }
 
-bool Rational::operator>=(const Rational & other) {
+bool Rational::operator>=(const Rational & other)  const {
     return !(*this < other);
 }
 
@@ -175,20 +197,78 @@ void Rational::simplify() {
 }
 
 Rational Rational::sqrt() {
-    Rational x = *(new Rational(*this/2));
-    while (x.numer <= 65536 && x.denom <= 65536) {
+    if (*this == Rational(0)) {
+        return Rational(0);
+    }
+    Rational x = *this;
+    while (x.numer <= 155650 && x.denom <= 155650) {
         x = Rational(1, 2) * (x + *this/x);
     }
     return x;
 }
 
 Rational Rational::sqrt(const Rational & a) {
-    Rational x = *(new Rational(a/2));
-    while (x.numer <= 65536 && x.denom <= 65536) {
+    if (a == Rational(0)) {
+        Rational(0);
+    }
+    Rational x = a;
+    while (x.numer <= 65565 && x.denom <= 65535) {
         x = Rational(1, 2) * (x + a/x);
     }
     return x;
 }
+
+Rational::operator double() const {
+    return (double) this->numer / (double) this->denom;
+}
+
+Rational Rational::operator+(int a) const {
+    return *this + Rational(a);
+}
+
+Rational Rational::operator-(int a) const {
+    return *this - Rational(a);
+}
+
+Rational Rational::operator*(int a) const {
+    return *this * Rational(a);
+}
+
+Rational Rational::operator/(int a) const {
+    return *this / Rational(a);
+}
+
+ostream& operator<<(ostream & out, const Rational r) {
+    out << r.getNumer() << "/" << r.getDenom();
+    return out;
+}
+
+istream& operator>>(istream & in, Rational & r) {
+    string line;
+    getline(in, line, '\n');
+    string num_s = "", den_s = "";
+    bool met = false;
+    for (int i = 0; i < line.length(); i++) {
+        if (line[i] == '/') {
+            met = true;
+            continue;
+        }
+        if (met) {
+            if (line[i] >= '0' && line[i] <= '9')
+                den_s += line[i];
+            else
+                throw exception();
+        } else {
+            if ((line[i] >= '0' && line[i] <= '9') || (line[i] == '-' && i==0))
+                num_s += line[i];
+            else
+                throw exception();
+        }
+    }
+    r = *(new Rational(atoi(num_s.c_str()), atoi(den_s.c_str())));
+    return in;
+}
+
 
 
 
